@@ -10,10 +10,10 @@
   <ItemGroup>
     <Compile Remove="Tests\ACRTestUtil.cs" />
   </ItemGroup>
-   <ItemGroup> 
-    <None Update="SessionRecords\**\*.json"> 
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory> 
-    </None> 
+  <ItemGroup>
+    <None Update="SessionRecords\**\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Management.ContainerRegistry" />

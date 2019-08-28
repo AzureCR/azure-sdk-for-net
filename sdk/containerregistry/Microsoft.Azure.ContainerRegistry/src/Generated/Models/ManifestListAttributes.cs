@@ -32,7 +32,7 @@ namespace Microsoft.Azure.ContainerRegistry.Models
         /// application/vnd.docker.image.manifest.v1+json</param>
         /// <param name="size">The size in bytes of the object</param>
         /// <param name="digest">The digest of the content, as defined by the
-        /// Registry V2 HTTP API Specificiation</param>
+        /// Registry V2 HTTP API Specification</param>
         public ManifestListAttributes(string mediaType = default(string), long? size = default(long?), string digest = default(string), Platform platform = default(Platform))
         {
             MediaType = mediaType;
@@ -63,7 +63,7 @@ namespace Microsoft.Azure.ContainerRegistry.Models
 
         /// <summary>
         /// Gets or sets the digest of the content, as defined by the Registry
-        /// V2 HTTP API Specificiation
+        /// V2 HTTP API Specification
         /// </summary>
         [JsonProperty(PropertyName = "digest")]
         public string Digest { get; set; }

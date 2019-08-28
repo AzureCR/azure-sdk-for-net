@@ -32,11 +32,7 @@ namespace Microsoft.Azure.ContainerRegistry.Models
         /// Initializes a new instance of the ManifestWrapper class.
         /// </summary>
         /// <param name="schemaVersion">Schema version</param>
-        /// <param name="mediaType">Media type for this Manifest. Possible
-        /// values include:
-        /// 'application/vnd.docker.distribution.manifest.list.v2+json',
-        /// 'application/vnd.docker.distribution.manifest.v2+json',
-        /// 'application/vnd.oci.image.manifest.v1+json'</param>
+        /// <param name="mediaType">Media type for this Manifest</param>
         /// <param name="manifests">(ManifestList, OCIIndex) List of V2 image
         /// layer information</param>
         /// <param name="config">(V2, OCI) Image config descriptor</param>
@@ -73,10 +69,7 @@ namespace Microsoft.Azure.ContainerRegistry.Models
         partial void CustomInit();
 
         /// <summary>
-        /// Gets or sets media type for this Manifest. Possible values include:
-        /// 'application/vnd.docker.distribution.manifest.list.v2+json',
-        /// 'application/vnd.docker.distribution.manifest.v2+json',
-        /// 'application/vnd.oci.image.manifest.v1+json'
+        /// Gets or sets media type for this Manifest
         /// </summary>
         [JsonProperty(PropertyName = "mediaType")]
         public string MediaType { get; set; }

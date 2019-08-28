@@ -25,7 +25,7 @@
             using (var context = MockContext.Start(GetType().FullName, nameof(GetBlob)))
             {
                 AzureContainerRegistryClient client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistry);
-                Stream blob = await client.GetBlobAsync(ACRTestUtil.ProdRepository, ProdConfigBlobDigest);
+                Stream blob = await client.Blob.GetAsync(ACRTestUtil.ProdRepository, ProdConfigBlobDigest);
                 StreamReader reader = new StreamReader(blob, Encoding.UTF8);
                 string originalBlob = reader.ReadToEnd();
                 Assert.Equal(ProdConfigBlob, originalBlob);
@@ -38,7 +38,7 @@
             using (var context = MockContext.Start(GetType().FullName, nameof(CheckBlob)))
             {
                 AzureContainerRegistryClient client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistry);
-                var blob = await client.CheckBlobAsync(ACRTestUtil.ProdRepository, ProdConfigBlobDigest);
+                var blob = await client.Blob.CheckAsync(ACRTestUtil.ProdRepository, ProdConfigBlobDigest);
                 Assert.Equal(blob.DockerContentDigest, ProdConfigBlobDigest);
                 Assert.Equal(5635, blob.ContentLength);
             }
@@ -51,20 +51,10 @@
             {
                 AzureContainerRegistryClient client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistryForChanges);
                 string digest = await UploadLayer(GenerateStreamFromString("Testdata"), client, ACRTestUtil.BlobTestRepository);
-                var blob = await client.GetBlobAsync(ACRTestUtil.BlobTestRepository, digest);
-                await client.DeleteBlobAsync(ACRTestUtil.BlobTestRepository, digest);
+                var blob = await client.Blob.GetAsync(ACRTestUtil.BlobTestRepository, digest);
+                await client.Blob.DeleteAsync(ACRTestUtil.BlobTestRepository, digest);
                 // Should not find layer
-                Assert.Throws<AcrErrorsException>(() => { client.CheckBlobAsync(ACRTestUtil.BlobTestRepository, digest).GetAwaiter().GetResult(); }); // Should error
-            }
-        }
-
-        [Fact]
-        public async Task UploadLayerSpecified()
-        {
-            using (var context = MockContext.Start(GetType().FullName, nameof(UploadLayerSpecified)))
-            {
-                AzureContainerRegistryClient client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistry);
-
+                Assert.Throws<AcrErrorsException>(() => { client.Blob.CheckAsync(ACRTestUtil.BlobTestRepository, digest).GetAwaiter().GetResult(); }); // Should error
             }
         }
 
@@ -75,7 +65,7 @@
             {
                 AzureContainerRegistryClient client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistry);
                 string digest = await UploadLayer(GenerateStreamFromString("SomethingElse"), client, ACRTestUtil.BlobTestRepository);
-                var blob = await client.GetBlobAsync(ACRTestUtil.BlobTestRepository, digest);
+                var blob = await client.Blob.GetAsync(ACRTestUtil.BlobTestRepository, digest);
                 StreamReader reader = new StreamReader(blob, Encoding.UTF8);
                 Assert.Equal("SomethingElse", reader.ReadToEnd());
             }
@@ -87,8 +77,8 @@
             using (var context = MockContext.Start(GetType().FullName, nameof(CancelBlobUpload)))
             {
                 AzureContainerRegistryClient client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistryForChanges);
-                var uploadInfo = await client.StartBlobUploadAsync(ACRTestUtil.changeableRepository);
-                await client.CancelBlobUploadAsync(uploadInfo.Location.Substring(1));
+                var uploadInfo = await client.Blob.StartUploadAsync(ACRTestUtil.changeableRepository);
+                await client.Blob.CancelUploadAsync(uploadInfo.Location);
             }
         }
 
@@ -98,35 +88,11 @@
             using (var context = MockContext.Start(GetType().FullName, nameof(GetBlobStatus)))
             {
                 AzureContainerRegistryClient client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistry);
-                var uploadInfo = await client.StartBlobUploadAsync(ACRTestUtil.BlobTestRepository);
-                var status = await client.GetBlobStatusAsync(uploadInfo.Location.Substring(1));
+                var uploadInfo = await client.Blob.StartUploadAsync(ACRTestUtil.BlobTestRepository);
+                var status = await client.Blob.GetStatusAsync(uploadInfo.Location.Substring(1));
                 Assert.Equal(uploadInfo.DockerUploadUUID, status.DockerUploadUUID);
                 Assert.Equal("0-0", status.Range);
-                await client.CancelBlobUploadAsync(uploadInfo.Location.Substring(1));
-            }
-        }
-
-        [Fact]
-        public async Task UploadLayerByParts()
-        {
-            using (var context = MockContext.Start(GetType().FullName, nameof(UploadLayerByParts)))
-            {
-                AzureContainerRegistryClient client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistryForChanges);
-                var blob = GenerateStreamFromString(ProdConfigBlob.Substring(0,300));
-                // Make copy to obtain the ability to rewind the stream
-                Stream cpy = new MemoryStream();
-                blob.CopyTo(cpy);
-                cpy.Position = 0;
-
-                string digest = ComputeDigest(cpy);
-                cpy.Position = 0;
-
-                var uploadInfo = await client.StartBlobUploadAsync(ACRTestUtil.BlobTestRepository);
-                var uploadedChunk = await client.UploadBlobChunkAsync(cpy, "0-299", uploadInfo.Location.Substring(1));
-                var status = await client.GetBlobStatusAsync(uploadedChunk.Location.Substring(1));
-                Assert.Equal("0-299", status.Range);
-                await client.CancelBlobUploadAsync(uploadedChunk.Location.Substring(1));
-
+                await client.Blob.CancelUploadAsync(uploadInfo.Location);
             }
         }
 
@@ -136,10 +102,24 @@
             using (var context = MockContext.Start(GetType().FullName, nameof(GetBlobChunk)))
             {
                 AzureContainerRegistryClient client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistry);
-                Stream blob = await client.GetBlobChunkAsync(ACRTestUtil.ProdRepository, ProdConfigBlobDigest, "bytes=0-299");
+                Stream blob = await client.Blob.GetChunkAsync(ACRTestUtil.ProdRepository, ProdConfigBlobDigest, "bytes=0-299");
                 StreamReader reader = new StreamReader(blob, Encoding.UTF8);
                 string originalBlob = reader.ReadToEnd();
                 Assert.Equal(ProdConfigBlob.Substring(0, 300), originalBlob);
+            }
+        }
+
+        [Fact]
+        public async Task MountBlob()
+        {
+            using (var context = MockContext.Start(GetType().FullName, nameof(MountBlob)))
+            {
+                AzureContainerRegistryClient client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistryForChanges);
+                var res = await client.Blob.MountAsync("somethingnew", "doundo/bash", "sha256:16463e0c481e161aabb735437d30b3c9c7391c2747cc564bb927e843b73dcb39");
+                Stream blob = await client.Blob.GetAsync("somethingnew", "sha256:16463e0c481e161aabb735437d30b3c9c7391c2747cc564bb927e843b73dcb39");
+                StreamReader reader = new StreamReader(blob, Encoding.UTF8);
+                string originalBlob = reader.ReadToEnd();
+                Assert.Equal(ProdConfigBlob, originalBlob);
             }
         }
 
@@ -149,7 +129,7 @@
             using (var context = MockContext.Start(GetType().FullName, nameof(CheckBlobChunk)))
             {
                 AzureContainerRegistryClient client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistry);
-                var blobData = await client.CheckBlobChunkAsync(ACRTestUtil.ProdRepository, ProdConfigBlobDigest, "bytes=0-300");
+                var blobData = await client.Blob.CheckChunkAsync(ACRTestUtil.ProdRepository, ProdConfigBlobDigest, "bytes=0-300");
                 //Range is actually ignored in this request. Ends up working quite similarly to CheckBlob
                 Assert.Equal(5635, blobData.ContentLength);
             }
@@ -165,9 +145,9 @@
             string digest = ComputeDigest(cpy);
             cpy.Position = 0;
 
-            var uploadInfo = await client.StartBlobUploadAsync(repository);
-            var uploadedLayer = await client.UploadBlobAsync(cpy, uploadInfo.Location.Substring(1));
-            var uploadedLayerEnd = await client.EndBlobUploadAsync(digest, uploadedLayer.Location.Substring(1));
+            var uploadInfo = await client.Blob.StartUploadAsync(repository);
+            var uploadedLayer = await client.Blob.UploadAsync(cpy, uploadInfo.Location);
+            var uploadedLayerEnd = await client.Blob.EndUploadAsync(digest, uploadedLayer.Location);
             return uploadedLayerEnd.DockerContentDigest;
         }
 

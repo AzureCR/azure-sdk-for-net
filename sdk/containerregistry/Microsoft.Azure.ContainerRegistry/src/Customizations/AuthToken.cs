@@ -123,7 +123,7 @@ namespace Microsoft.Azure.ContainerRegistry
             {
                 // Note: should be using real new access token
                 aadToken.CheckAndRefresh();
-                return authClient.GetRefreshTokenFromExchangeAsync("access_token", loginUrl, "", null, aadToken.Value).GetAwaiter().GetResult().RefreshTokenProperty;
+                return authClient.RefreshTokens.GetFromExchangeAsync("access_token", loginUrl, "", null, aadToken.Value).GetAwaiter().GetResult().RefreshTokenProperty;
             };
             Refresh();
         }
@@ -148,7 +148,7 @@ namespace Microsoft.Azure.ContainerRegistry
             RefreshFn = () =>
             {
                 acrRefresh.CheckAndRefresh();
-                return authClient.GetAccessTokenAsync(loginUrl, scope, acrRefresh.Value).GetAwaiter().GetResult().AccessTokenProperty;
+                return authClient.AccessTokens.GetAsync(loginUrl, scope, acrRefresh.Value).GetAwaiter().GetResult().AccessTokenProperty;
             };
             Refresh();
         }
@@ -161,7 +161,7 @@ namespace Microsoft.Azure.ContainerRegistry
             };
             RefreshFn = () =>
             {
-                return authClient.GetAccessTokenFromLoginAsync(loginUrl, scope).GetAwaiter().GetResult().AccessTokenProperty;
+                return authClient.AccessTokens.GetFromLoginAsync(loginUrl, scope).GetAwaiter().GetResult().AccessTokenProperty;
             };
             Refresh();
         }

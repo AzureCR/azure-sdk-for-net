@@ -16,7 +16,7 @@ namespace Microsoft.Azure.ContainerRegistry.Models
     using System.Linq;
 
     /// <summary>
-    /// Additional information provided through arbitrary metadata
+    /// Additional information provided through arbitrary metadata.
     /// </summary>
     public partial class Annotations
     {
@@ -37,13 +37,13 @@ namespace Microsoft.Azure.ContainerRegistry.Models
         /// (string, date-time as defined by
         /// https://tools.ietf.org/html/rfc3339#section-5.6)</param>
         /// <param name="authors">Contact details of the people or organization
-        /// responsible for the image (freeform string)</param>
-        /// <param name="url">URL to find more information on the image
-        /// (string)</param>
-        /// <param name="documentation">URL to get documentation on the image
-        /// (string)</param>
-        /// <param name="source">URL to get source code for building the image
-        /// (string)</param>
+        /// responsible for the image.</param>
+        /// <param name="url">URL to find more information on the
+        /// image.</param>
+        /// <param name="documentation">URL to get documentation on the
+        /// image.</param>
+        /// <param name="source">URL to get source code for building the
+        /// image.</param>
         /// <param name="version">Version of the packaged software. The version
         /// MAY match a label or tag in the source code repository, may also be
         /// Semantic versioning-compatible</param>
@@ -53,12 +53,10 @@ namespace Microsoft.Azure.ContainerRegistry.Models
         /// or individual.</param>
         /// <param name="licenses">License(s) under which contained software is
         /// distributed as an SPDX License Expression.</param>
-        /// <param name="name">Name of the reference for a target (string).
-        /// </param>
-        /// <param name="title">Human-readable title of the image
-        /// (string)</param>
+        /// <param name="name">Name of the reference for a target.</param>
+        /// <param name="title">Human-readable title of the image</param>
         /// <param name="description">Human-readable description of the
-        /// software packaged in the image (string)</param>
+        /// software packaged in the image</param>
         public Annotations(IDictionary<string, object> additionalProperties = default(IDictionary<string, object>), System.DateTime? created = default(System.DateTime?), string authors = default(string), string url = default(string), string documentation = default(string), string source = default(string), string version = default(string), string revision = default(string), string vendor = default(string), string licenses = default(string), string name = default(string), string title = default(string), string description = default(string))
         {
             AdditionalProperties = additionalProperties;
@@ -99,25 +97,25 @@ namespace Microsoft.Azure.ContainerRegistry.Models
 
         /// <summary>
         /// Gets or sets contact details of the people or organization
-        /// responsible for the image (freeform string)
+        /// responsible for the image.
         /// </summary>
         [JsonProperty(PropertyName = "org.opencontainers.image.authors")]
         public string Authors { get; set; }
 
         /// <summary>
-        /// Gets or sets URL to find more information on the image (string)
+        /// Gets or sets URL to find more information on the image.
         /// </summary>
         [JsonProperty(PropertyName = "org.opencontainers.image.url")]
         public string Url { get; set; }
 
         /// <summary>
-        /// Gets or sets URL to get documentation on the image (string)
+        /// Gets or sets URL to get documentation on the image.
         /// </summary>
         [JsonProperty(PropertyName = "org.opencontainers.image.documentation")]
         public string Documentation { get; set; }
 
         /// <summary>
-        /// Gets or sets URL to get source code for building the image (string)
+        /// Gets or sets URL to get source code for building the image.
         /// </summary>
         [JsonProperty(PropertyName = "org.opencontainers.image.source")]
         public string Source { get; set; }
@@ -152,20 +150,20 @@ namespace Microsoft.Azure.ContainerRegistry.Models
         public string Licenses { get; set; }
 
         /// <summary>
-        /// Gets or sets name of the reference for a target (string).
+        /// Gets or sets name of the reference for a target.
         /// </summary>
         [JsonProperty(PropertyName = "org.opencontainers.image.ref.name")]
         public string Name { get; set; }
 
         /// <summary>
-        /// Gets or sets human-readable title of the image (string)
+        /// Gets or sets human-readable title of the image
         /// </summary>
         [JsonProperty(PropertyName = "org.opencontainers.image.title")]
         public string Title { get; set; }
 
         /// <summary>
         /// Gets or sets human-readable description of the software packaged in
-        /// the image (string)
+        /// the image
         /// </summary>
         [JsonProperty(PropertyName = "org.opencontainers.image.description")]
         public string Description { get; set; }

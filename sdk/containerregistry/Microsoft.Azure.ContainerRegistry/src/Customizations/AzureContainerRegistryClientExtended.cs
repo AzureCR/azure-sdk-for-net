@@ -23,7 +23,7 @@ namespace Microsoft.Azure.ContainerRegistry
         /// Thrown when a required parameter is null
         /// </exception>
 
-        public AzureContainerRegistryClient(System.Uri loginUri, ServiceClientCredentials credentials, params DelegatingHandler[] handlers) : this(handlers)
+        internal AzureContainerRegistryClient(System.Uri loginUri, ServiceClientCredentials credentials, params DelegatingHandler[] handlers) : this(handlers)
         {
             if (loginUri == null)
             {
