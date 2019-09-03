@@ -51,7 +51,7 @@ namespace ContainerRegistry.Tests
                 Assert.False(repositoryDetails.ChangeableAttributes.WriteEnabled);
             }
         }
-             
+
 
         [Fact]
         public async Task DeleteAcrRepository()

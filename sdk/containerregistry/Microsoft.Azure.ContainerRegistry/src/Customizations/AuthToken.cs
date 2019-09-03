@@ -1,9 +1,6 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using Microsoft.Rest;
+﻿using Microsoft.Rest;
 using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -14,18 +11,18 @@ namespace Microsoft.Azure.ContainerRegistry
     /* Simple authentication class for use with Token related api calls for determining scopes and other such things*/
     public class TokenCredentials : ServiceClientCredentials
     {
-        private string AuthHeader { get; set; }
+        private string _authHeader { get; set; }
 
         /*To be used for General Login Scheme*/
         public TokenCredentials(string username, string password)
         {
-            AuthHeader = EncodeTo64(username + ":" + password);
+            _authHeader = EncodeTo64(username + ":" + password);
         }
 
         /*To be used for exchanging AAD Tokens for ACR Tokens*/
         public TokenCredentials()
         {
-            AuthHeader = null;
+            _authHeader = null;
         }
 
         public override async Task ProcessHttpRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
@@ -34,9 +31,9 @@ namespace Microsoft.Azure.ContainerRegistry
             {
                 throw new ArgumentNullException("request");
             }
-            if (AuthHeader != null)
+            if (_authHeader != null)
             {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Basic", AuthHeader);
+                request.Headers.Authorization = new AuthenticationHeaderValue("Basic", _authHeader);
             }
             await base.ProcessHttpRequestAsync(request, cancellationToken);
         }
@@ -59,7 +56,7 @@ namespace Microsoft.Azure.ContainerRegistry
         public delegate string acquireCallback();
         private static readonly JwtSecurityTokenHandler JwtSecurityClient = new JwtSecurityTokenHandler();
 
-        // Constant to refresh tokens slighly before they are to expire guarding against possible latency related crashes
+        // Constant to refresh tokens slightly before they are to expire guarding against possible latency related crashes
         private TimeSpan LATENCY_SAFETY { get; set; } = TimeSpan.FromMinutes(2);
 
         public string Value { get; set; }
@@ -81,7 +78,7 @@ namespace Microsoft.Azure.ContainerRegistry
         protected AuthToken() { }
 
 
-        /* Returns true if refresh was succesful. */
+        /* Returns true if refresh was successful. */
         public bool Refresh()
         {
             if (RefreshFn == null)
@@ -111,11 +108,11 @@ namespace Microsoft.Azure.ContainerRegistry
     // refreshing this requires an aad access token
     public class AcrRefreshToken : AuthToken
     {
-        private AzureContainerRegistryClient authClient;
+        private AzureContainerRegistryClient _authClient;
         public AcrRefreshToken(string token) : base(token) { }
         public AcrRefreshToken(AuthToken aadToken, string loginUrl)
         {
-            authClient = new AzureContainerRegistryClient(new TokenCredentials())
+            _authClient = new AzureContainerRegistryClient(new TokenCredentials())
             {
                 LoginUri = "https://" + loginUrl
             };
@@ -123,7 +120,7 @@ namespace Microsoft.Azure.ContainerRegistry
             {
                 // Note: should be using real new access token
                 aadToken.CheckAndRefresh();
-                return authClient.RefreshTokens.GetFromExchangeAsync("access_token", loginUrl, "", null, aadToken.Value).GetAwaiter().GetResult().RefreshTokenProperty;
+                return _authClient.RefreshTokens.GetFromExchangeAsync("access_token", loginUrl, "", null, aadToken.Value).GetAwaiter().GetResult().RefreshTokenProperty;
             };
             Refresh();
         }
@@ -134,34 +131,34 @@ namespace Microsoft.Azure.ContainerRegistry
     // Refreshing this requires a nice refresh token
     public class AcrAccessToken : AuthToken
     {
-        private AzureContainerRegistryClient authClient;
+        private AzureContainerRegistryClient _authClient;
         public string Scope { get; set; }
         public AcrAccessToken(string token) : base(token) { }
         public AcrAccessToken(string token, acquireCallback refreshFn) : base(token, refreshFn) { }
         public AcrAccessToken(AcrRefreshToken acrRefresh, string scope, string loginUrl)
         {
             Scope = scope;
-            authClient = new AzureContainerRegistryClient(new TokenCredentials())
+            _authClient = new AzureContainerRegistryClient(new TokenCredentials())
             {
                 LoginUri = "https://" + loginUrl
             };
             RefreshFn = () =>
             {
                 acrRefresh.CheckAndRefresh();
-                return authClient.AccessTokens.GetAsync(loginUrl, scope, acrRefresh.Value).GetAwaiter().GetResult().AccessTokenProperty;
+                return _authClient.AccessTokens.GetAsync(loginUrl, scope, acrRefresh.Value).GetAwaiter().GetResult().AccessTokenProperty;
             };
             Refresh();
         }
         public AcrAccessToken(string username, string password, string scope, string loginUrl)
         {
             Scope = scope;
-            authClient = new AzureContainerRegistryClient(new TokenCredentials(username, password))
+            _authClient = new AzureContainerRegistryClient(new TokenCredentials(username, password))
             {
                 LoginUri = "https://" + loginUrl
             };
             RefreshFn = () =>
             {
-                return authClient.AccessTokens.GetFromLoginAsync(loginUrl, scope).GetAwaiter().GetResult().AccessTokenProperty;
+                return _authClient.AccessTokens.GetFromLoginAsync(loginUrl, scope).GetAwaiter().GetResult().AccessTokenProperty;
             };
             Refresh();
         }

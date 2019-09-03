@@ -2,12 +2,8 @@
 {
     using Microsoft.Azure.ContainerRegistry;
     using Microsoft.Azure.ContainerRegistry.Models;
-    using Microsoft.Azure.Management.ContainerRegistry.Models;
     using Microsoft.Rest.ClientRuntime.Azure.TestFramework;
-    using System;
-    using System.IdentityModel.Tokens.Jwt;
     using System.IO;
-    using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
     using System.Threading.Tasks;

@@ -7,7 +7,6 @@ namespace ContainerRegistry.Tests
     using Microsoft.Azure.ContainerRegistry;
     using Microsoft.Azure.ContainerRegistry.Models;
     using Microsoft.Rest.ClientRuntime.Azure.TestFramework;
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
@@ -373,7 +372,7 @@ namespace ContainerRegistry.Tests
                 //Check for success
                 Assert.False(updatedManifest.Attributes.ChangeableAttributes.WriteEnabled);
 
-                //Return attibutes to original
+                //Return attributes to original
                 updateAttributes.WriteEnabled = true;
                 await client.Manifests.UpdateAttributesAsync(ACRTestUtil.changeableRepository, digest, updateAttributes);
                 updatedManifest = await client.Manifests.GetAttributesAsync(ACRTestUtil.changeableRepository, digest);
@@ -475,7 +474,8 @@ namespace ContainerRegistry.Tests
             }
         }
 
-        private void VerifyAnnotations(Annotations expected, Annotations actual) {
+        private void VerifyAnnotations(Annotations expected, Annotations actual)
+        {
             if ((expected == null) && (actual == null)) { return; };
             Assert.True((expected == null) == (actual == null));
             Assert.Equal(expected.Authors, actual.Authors);

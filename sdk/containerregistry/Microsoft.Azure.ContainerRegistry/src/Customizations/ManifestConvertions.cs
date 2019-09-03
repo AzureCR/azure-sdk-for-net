@@ -1,8 +1,4 @@
-﻿using System;
-using System.Reflection;
-using System.Linq;
-using System.Collections.Generic;
-
+﻿
 namespace Microsoft.Azure.ContainerRegistry.Models
 {
     public partial class V2Manifest : Manifest
@@ -24,7 +20,7 @@ namespace Microsoft.Azure.ContainerRegistry.Models
     public partial class V1Manifest : Manifest
     {
         /// <summary>
-        /// Provides a method to convert ManifestWrapper to V21anifest
+        /// Provides a method to convert ManifestWrapper to V21Manifest
         /// </summary>
         public static explicit operator V1Manifest(ManifestWrapper v)
         {

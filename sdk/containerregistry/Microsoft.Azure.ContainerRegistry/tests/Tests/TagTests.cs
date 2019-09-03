@@ -91,10 +91,10 @@ namespace ContainerRegistry.Tests
                 var client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistryForChanges);
                 var tags = await client.Tag.GetListAsync(ACRTestUtil.deleteableRepository);
 
-                //await client.DeleteTagAsync(ACRTestUtil.deleteableRepository, tags.[0]);
+                await client.Tag.DeleteAsync(ACRTestUtil.deleteableRepository, tags.Tags[0]);
 
                 var newTags = await client.Tag.GetListAsync(ACRTestUtil.deleteableRepository);
-               // Assert.DoesNotContain(newTags.Tags, tag => { return tag.Equals(tags..Tags[0]); });
+                Assert.DoesNotContain(newTags.Tags, tag => { return tag.Equals(tags.Tags[0]); });
             }
         }
 
