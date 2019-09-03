@@ -24,8 +24,8 @@ namespace Microsoft.Azure.ContainerRegistry
     public partial interface IManifestsOperations
     {
         /// <summary>
-        /// Pulls the image manifest file associated with the specified name
-        /// and reference. Reference may be a tag or a digest
+        /// Get the manifest identified by `name` and `reference` where
+        /// `reference` can be a tag or digest.
         /// </summary>
         /// <param name='name'>
         /// Name of the image (including the namespace)

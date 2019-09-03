@@ -90,7 +90,7 @@ namespace Microsoft.Azure.ContainerRegistry
         /// Name of the image (including the namespace)
         /// </param>
         /// <param name='reference'>
-        /// Tag or digest of the target manifest
+        /// Tag name
         /// </param>
         /// <param name='value'>
         /// Repository attribute value
@@ -115,7 +115,7 @@ namespace Microsoft.Azure.ContainerRegistry
         /// Name of the image (including the namespace)
         /// </param>
         /// <param name='reference'>
-        /// Tag or digest of the target manifest
+        /// Tag name
         /// </param>
         /// <param name='customHeaders'>
         /// The headers that will be added to request.
