@@ -260,6 +260,104 @@ namespace ContainerRegistry.Tests
                 }
             }
         };
+
+        private static readonly ManifestList ExpectedManifestList = new ManifestList()
+        {
+                MediaType = "application/vnd.docker.distribution.manifest.list.v2+json",
+                Manifests = new List<ManifestListAttributes>
+        {
+            new ManifestListAttributes
+            {
+                MediaType = "application/vnd.docker.distribution.manifest.v2+json",
+                Size = 528,
+                Digest = "sha256:4b36b0347b2c6b02adc54a3d8e8143299e7c733b4dcadb95c1d4c8b6da720172",
+                Platform = new Platform
+                {
+                    Architecture = "amd64",
+                    Os = "linux",
+                    Osversion = null,
+                    Osfeatures = null,
+                    Variant = null,
+                    Features = null
+                }
+            },
+            new ManifestListAttributes
+            {
+                MediaType = "application/vnd.docker.distribution.manifest.v2+json",
+                Size = 838,
+                Digest = "sha256:2542c76d5ba87f9923ebcc6711677a2167dedf33e382f61a97772ae35106274d",
+                Platform = new Platform
+                {
+                    Architecture = "amd64",
+                    Os = "windows",
+                    Osversion = "10.0.18362.295",
+                    Osfeatures = null,
+                    Variant = null,
+                    Features = null
+                }
+            }
+        },
+            SchemaVersion = 2
+        };
+
+        private static readonly OCIIndex ExpectedOCIIndex = new OCIIndex()
+        {
+            Manifests = new List<ManifestListAttributes>
+            {
+                new ManifestListAttributes
+                {
+                    MediaType = "application/vnd.docker.distribution.manifest.v2+json",
+                    Size = 528,
+                    Digest = "sha256:4b36b0347b2c6b02adc54a3d8e8143299e7c733b4dcadb95c1d4c8b6da720172",
+                    Platform = new Platform
+                    {
+                        Architecture = "amd64",
+                        Os = "linux",
+                        Osversion = null,
+                        Osfeatures = null,
+                        Variant = null,
+                        Features = null
+                    }
+                },
+                new ManifestListAttributes
+                {
+                    MediaType = "application/vnd.docker.distribution.manifest.v2+json",
+                    Size = 838,
+                    Digest = "sha256:2542c76d5ba87f9923ebcc6711677a2167dedf33e382f61a97772ae35106274d",
+                    Platform = new Platform
+                    {
+                        Architecture = "amd64",
+                        Os = "windows",
+                        Osversion = "10.0.18362.295",
+                        Osfeatures = null,
+                        Variant = null,
+                        Features = null
+                    }
+                }
+            },
+            Annotations = new Annotations
+            {
+                AdditionalProperties = new Dictionary<string, object>
+                {
+                    { "com.example.key1" , "value1" },
+                    { "com.example.key2", "value2" }
+                },
+                Created = null,
+                Authors = null,
+                Url = null,
+                Documentation = null,
+                Source = null,
+                Version = null,
+                Revision = null,
+                Vendor = null,
+                Licenses = null,
+                Name = null,
+                Title = null,
+                Description = null
+            },
+            SchemaVersion = 2
+        };
+
         #endregion
 
         [Fact]
@@ -317,19 +415,19 @@ namespace ContainerRegistry.Tests
                 VerifyManifest(ExpectedOCIManifestProd, manifest);
             }
         }
-        /*
+        
         [Fact]
         public async Task GetOCIIndex()
         {
             using (var context = MockContext.Start(GetType().FullName, nameof(GetOCIIndex)))
             {
-                var tag = "latest";
+                var tag = "oci";
                 var client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistry);
-                var manifest = (OCIIndex)await client.GetManifestAsync(ACRTestUtil.OCIIndexTestRepository, tag, ACRTestUtil.MediatypeV2Manifest);
-                VerifyManifest(ExpectedV2ManifestProd, manifest);
+                var manifest = (OCIIndex)await client.Manifests.GetAsync(ACRTestUtil.ManifestListTestRepository, tag, ACRTestUtil.MediatypeOCIIndex);
+                VerifyManifest(ExpectedOCIIndex, manifest);
             }
         }
-
+        
         [Fact]
         public async Task GetManifestList()
         {
@@ -337,11 +435,11 @@ namespace ContainerRegistry.Tests
             {
                 var tag = "latest";
                 var client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistry);
-                var manifest = (ManifestList)await client.GetManifestAsync(ACRTestUtil.ManifestListTestRepository, tag, ACRTestUtil.MediatypeV2Manifest);
-                VerifyManifest(ExpectedV2ManifestProd, manifest);
+                var manifest = (ManifestList)await client.Manifests.GetAsync(ACRTestUtil.ManifestListTestRepository, tag, ACRTestUtil.MediatypeManifestList);
+                VerifyManifest(ExpectedManifestList, manifest);
             }
         }
-        */
+
         [Fact]
         public async Task GetV2Manifest()
         {

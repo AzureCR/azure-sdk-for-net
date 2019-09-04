@@ -41,7 +41,7 @@ namespace ContainerRegistry.Tests
         internal static readonly string MediatypeOCIIndex = "application/vnd.oci.image.index.v1+json";
         internal static readonly string MediatypeManifestList = "application/vnd.docker.distribution.manifest.list.v2+json";
         internal static readonly string OCIIndexTestRepository = "";
-        internal static readonly string ManifestListTestRepository = "";
+        internal static readonly string ManifestListTestRepository = "multi-hello-world";
         internal static readonly string BlobTestRepository = "blobland";
         internal static string OCITestRepository = "oras";
 

@@ -22,11 +22,12 @@ namespace ContainerRegistry.Tests
                 var repositories = await client.Repository.GetListAsync(null, 1);
 
                 Assert.Equal(1, repositories.Names.Count);
-                Assert.Collection(repositories.Names, name => Assert.Equal(ACRTestUtil.OCITestRepository, name));
+                Assert.Collection(repositories.Names, name => Assert.Equal(ACRTestUtil.ManifestListTestRepository, name));
 
                 repositories = await client.Repository.GetListAsync();
-                Assert.Equal(3, repositories.Names.Count);
-                Assert.Collection(repositories.Names, name => Assert.Equal(ACRTestUtil.OCITestRepository, name),
+                Assert.Equal(4, repositories.Names.Count);
+                Assert.Collection(repositories.Names, name => Assert.Equal(ACRTestUtil.ManifestListTestRepository, name),
+                                                      name => Assert.Equal(ACRTestUtil.OCITestRepository, name),
                                                       name => Assert.Equal(ACRTestUtil.ProdRepository, name),
                                                       name => Assert.Equal(ACRTestUtil.TestRepository, name));
             }
