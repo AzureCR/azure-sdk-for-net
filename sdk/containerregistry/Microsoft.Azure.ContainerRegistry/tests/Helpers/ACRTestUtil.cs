@@ -45,9 +45,12 @@ namespace ContainerRegistry.Tests
         internal static readonly string BlobTestRepository = "blobland";
         internal static string OCITestRepository = "oras";
 
-
-        /* Acquires an ACR client setup for the testing network. Note acquisition of credentials from registry
-         * must be possible for this to work in this way. */
+        /// <summary>
+        /// Acquires an ACR client setup for the testing network. Note acquisition of credentials from registry
+        /// must be possible for this to work in this way.
+        /// </summary>
+        /// <param name="registryName"> Registry to be used </param>
+        /// <returns></returns>
         public static async Task<AzureContainerRegistryClient> GetACRClientAsync(MockContext context, string registryName)
         {
             var registryManagementClient = context.GetServiceClient<ContainerRegistryManagementClient>(handlers: CreateNewRecordedDelegatingHandler());
@@ -63,18 +66,20 @@ namespace ContainerRegistry.Tests
             return acrClient;
         }
 
-        /* Acquires an AAD access token from the connection string setup in the environment variables.
-         * In order to run the tests outside of playback mode (where it replays the session recording files)
-         * you must first do the following:
-         * 
-         * Add environment variables:
-         * AZURE_TEST_MODE | set it to "record"
-         * 
-         * TEST_CSM_ORGID_AUTHENTICATION | set it to:
-         * SubscriptionId={subscription id for service principal};ServicePrincipal={servicePrincipal};ServicePrincipalSecret={serviceprincipalsecret};AADTenant={tenant of service principal};Environment=Prod;HttpRecorderMode=Record
-         * 
-         * Note that the the service principal in question must have access to the azuresdkunittest registry or any specified as prod in the future.
-         */
+        /// <summary>
+        /// Acquires an AAD access token from the connection string setup in the environment variables.
+        /// In order to run the tests outside of playback mode (where it replays the session recording files)
+        /// you must first do the following:
+        /// 
+        /// Add environment variables:
+        /// AZURE_TEST_MODE | set it to "record"
+        /// 
+        /// TEST_CSM_ORGID_AUTHENTICATION | set it to:
+        /// SubscriptionId={subscription id for service principal};ServicePrincipal={servicePrincipal};ServicePrincipalSecret={serviceprincipalsecret};AADTenant={tenant of service principal};Environment=Prod;HttpRecorderMode=Record
+        /// 
+        /// Note that the the service principal in question must have access to the azuresdkunittest registry or any specified as prod in the future.
+        /// </summary>
+
         public static async Task<string> getAADaccessToken()
         {
             TestEnvironment testEnvironment = TestEnvironmentFactory.GetTestEnvironment();
@@ -82,7 +87,7 @@ namespace ContainerRegistry.Tests
             string authClientId = testEnvironment.ConnectionString.KeyValuePairs[ConnectionStringKeys.ServicePrincipalKey];
             string authSecret = testEnvironment.ConnectionString.KeyValuePairs[ConnectionStringKeys.ServicePrincipalSecretKey];
 
-            /* Addresses issues from pipeline having no credentials to obtain AAD token. */
+            // Addresses issues from pipeline having no credentials to obtain AAD token. 
             if (String.IsNullOrEmpty(tenantId) || String.IsNullOrEmpty(authClientId) || String.IsNullOrEmpty(authSecret)) {
                 return "standintokenforpipeline";
             }
