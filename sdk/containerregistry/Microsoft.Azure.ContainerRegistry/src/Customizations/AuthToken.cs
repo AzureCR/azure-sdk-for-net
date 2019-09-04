@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 
 namespace Microsoft.Azure.ContainerRegistry
 {
-    /* Simple authentication class for use with Token related api calls for determining scopes and other such things*/
+    /// <summary>
+    /// Simple authentication class for use with Token related api calls for determining scopes and other such things
+    /// </summary>
     public class TokenCredentials : ServiceClientCredentials
     {
         private string _authHeader { get; set; }
@@ -46,10 +48,12 @@ namespace Microsoft.Azure.ContainerRegistry
         }
     }
 
-    /*This allows us to have refresh token chains. For example if an access token needs a refresh
-     it can use the refresh token which can be refreshed using an aad access token which can be
-     refreshed using an aad refresh token which can be obtained using service principals.  This 
-     will all be done internally and thus abstracts much of the checking away */
+    /// <summary>
+    /// This allows us to have refresh token chains. For example if an access token needs a refresh
+    /// it can use the refresh token which can be refreshed using an aad access token which can be
+    /// refreshed using an aad refresh token which can be obtained using service principals.This
+    /// will all be done internally and thus abstracts much of the checking away.
+    /// </summary>
     public class AuthToken
     {
 
@@ -104,8 +108,10 @@ namespace Microsoft.Azure.ContainerRegistry
             return true;
         }
     }
+    /// <summary>
+    /// Refreshing this requires an aad access token. This provides the built in exchange functionality.
+    /// </summary>
 
-    // refreshing this requires an aad access token
     public class AcrRefreshToken : AuthToken
     {
         private AzureContainerRegistryClient _authClient;
@@ -127,8 +133,9 @@ namespace Microsoft.Azure.ContainerRegistry
         public AcrRefreshToken(string token, acquireCallback refreshFn) : base(token, refreshFn) { }
 
     }
-
-    // Refreshing this requires a nice refresh token
+    /// <summary>
+    /// Refreshing this requires an ACR refresh token or username and password. Both constructors are provided.
+    /// </summary>
     public class AcrAccessToken : AuthToken
     {
         private AzureContainerRegistryClient _authClient;
