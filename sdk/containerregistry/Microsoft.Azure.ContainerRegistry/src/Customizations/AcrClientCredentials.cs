@@ -26,9 +26,9 @@ namespace Microsoft.Azure.ContainerRegistry
         /// </summary>
         public enum LoginMode
         {
-            Basic,
-            TokenAuth,
-            TokenAad
+            Basic, // Basic authentication
+            TokenAuth, // Authentication using oauth2 with login and password
+            TokenAad // Authentication using an AAD access token.
         }
 
         #endregion
@@ -56,8 +56,15 @@ namespace Microsoft.Azure.ContainerRegistry
 
         #region Constructors
 
-        /* Constructor for use when providing user credentials. Users may specify if basic authorization is to be used or if more secure JWT token reliant
-           authorization will be used. @Throws If LoginMode is set to TokenAad  */
+        /// <summary>
+        /// Constructor for use when providing user credentials. Users may specify if basic authorization is to be used or if more secure JWT token reliant
+        /// authorization will be used.
+        /// @Throws If LoginMode is set to TokenAad
+        /// <paramref name="mode"/> The credential acquisition mode, one of Basic, TokenAuth, or TokenAad
+        /// <paramref name="loginUrl"/> The url of the registry to be used
+        /// <paramref name="username"/> The username for the registry
+        /// <paramref name="password"/> The password for the registry
+        /// </summary>
         public AcrClientCredentials(LoginMode mode, string loginUrl, string username, string password, CancellationToken cancellationToken = default)
         {
             _acrScopes = new Dictionary<string, string>();
@@ -83,10 +90,17 @@ namespace Microsoft.Azure.ContainerRegistry
             _requestCancellationToken = cancellationToken;
         }
 
-        /*Constructor for use when providing an aad access token to be exchanged for an acr refresh token. Note that token expiration will require manually
-         providing new aad tokens. This model assumes the client is able to do this authentication themselves for AAD tokens. A callback can be provided to 
-         be executed once the ACR refresh token expires and can no longer be renewed as the provided Aad Token has expired.*/
-        public AcrClientCredentials(string aadAccessToken, string loginUrl, string tenant = null, string LoginUri = null, CancellationToken cancellationToken = default, AuthToken.acquireCallback acquireNewAad = null)
+        /// <summary>
+        /// Constructor for use when providing an aad access token to be exchanged for an acr refresh token. Note that token expiration will require manually
+        /// providing new aad tokens.This model assumes the client is able to do this authentication themselves for AAD tokens. A callback can be provided to
+        /// be executed once the ACR refresh token expires and can no longer be renewed as the provided Aad Token has expired.
+        /// <paramref name="aadAccessToken"/> The password for the registry
+        /// <paramref name="loginUrl"/> The Azure active directory access token to be used
+        /// <paramref name="tenant"/> The tenant of the aad access token (optional)
+        /// <paramref name="acquireNewAad"/> A function that can be called to refresh an aadAccessToken, providing a new one (optional) note, if this is not
+        /// provided the aad access token will expire over time and calls wll cease to work.
+        /// </summary>
+        public AcrClientCredentials(string aadAccessToken, string loginUrl, string tenant = null,  AuthToken.acquireCallback acquireNewAad = null, CancellationToken cancellationToken = default)
         {
             _acrScopes = new Dictionary<string, string>();
             _acrAccessTokens = new Dictionary<string, AcrAccessToken>();
@@ -112,7 +126,9 @@ namespace Microsoft.Azure.ContainerRegistry
 
         #region Overrides
 
-        /* Called on initialization of the credentials. This sets forth the type of authorization to be used. */
+        /// <summary>
+        /// Called on initialization of the credentials. This sets forth the type of authorization to be used if necessary.
+        /// </summary>
         public override void InitializeServiceClient<AzureContainerRegistryClient>(ServiceClient<AzureContainerRegistryClient> client)
         {
             if (_mode == LoginMode.Basic) // Basic Authentication
@@ -121,7 +137,9 @@ namespace Microsoft.Azure.ContainerRegistry
             }
         }
 
-        /*Handles all requests of the SDK providing the required authentication along the way.*/
+        /// <summary>
+        /// Handles all requests of the SDK providing the required authentication along the way.
+        /// </summary>
         public override async Task ProcessHttpRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
             if (request == null)
@@ -148,8 +166,11 @@ namespace Microsoft.Azure.ContainerRegistry
 
         #region Helpers
 
-        /* Acquires a new ACR access token if necessary. It can also acquire a cached access token in order to avoid extra requests to
-         * the oauth2 endpoint improving efficiency. */
+        /// <summary>
+        /// Acquires a new ACR access token if necessary. It can also acquire a cached access token in order to avoid extra requests to
+        /// the oauth2 endpoint improving efficiency.
+        /// <param name='scope'> The scope for the particuar operation. Can be obtained from the Www-Authenticate header.
+        /// </summary>
         public string getAcrAccessToken(string scope)
         {
             if (_mode == LoginMode.Basic)
@@ -180,10 +201,13 @@ namespace Microsoft.Azure.ContainerRegistry
             return _acrAccessTokens[scope].Value;
         }
 
+        /// <summary>
+        /// Acquires the required scope for a specific operation. This will be done by obtaining a challenge and parsing out the scope
+        /// from the ww-Authenticate header. In the event of failure (Some endpoints do not seem to return the scope) it will attempt
+        /// resolution through a small local resolver.
+        /// <param name='scope'> The scope for the particuar operation. Can be obtained from the Www-Authenticate header.
+        /// </summary>
 
-        /* Acquires the required scope for a specific operation. This will be done by obtaining a challenge and parsing out the scope
-         from the ww-Authenticate header. In the event of failure (Some endpoints do not seem to return the scope) it will attempt
-         resolution through a small local resolver. */
         public async Task<string> getScope(string operation, string method, string path)
         {
 
@@ -210,7 +234,10 @@ namespace Microsoft.Azure.ContainerRegistry
 
         }
 
-        /*Local resolver for endpoints that will often return no scope.*/
+        /// <summary>
+        /// Local resolver for endpoints that will often return no scope.
+        /// <param name='operation'> Operation for which a scope is necessary
+        /// </summary>
         private string hardcodedScopes(string operation)
         {
             switch (operation)
@@ -224,9 +251,11 @@ namespace Microsoft.Azure.ContainerRegistry
             }
         }
 
-        /* Meant to parse out comma separated key value pairs delineated by the = sign. Accepts strings of the
-         format "key=value,key2=value2..." . Note this method is meant to provide limited functionality and
-         is not very robust. */
+        /// <summary>
+        /// Meant to parse out comma separated key value pairs delineated by the = sign. Accepts strings of the
+        /// format "key=value,key2=value2..." . Note this method is meant to provide limited functionality and
+        /// is not very robust.
+        ///  </summary>
         private Dictionary<string, string> parseHeader(string header)
         {
 
@@ -244,7 +273,9 @@ namespace Microsoft.Azure.ContainerRegistry
             return parsed;
         }
 
-        /* Removes trailing whitespace or " characters */
+        /// <summary>
+        /// Removes trailing whitespace or " characters.
+        /// </summary>
         private string headerTrim(string toTrim)
         {
             toTrim = toTrim.Trim();
@@ -253,7 +284,9 @@ namespace Microsoft.Azure.ContainerRegistry
             return toTrim;
         }
 
-        /*Provides cleanup in case Cache is getting large. */
+        /// <summary>
+        /// Provides cleanup in case Cache is getting large. 
+        ///</summary>
         public void clearCache()
         {
             _acrAccessTokens.Clear();
