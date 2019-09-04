@@ -47,7 +47,6 @@
             {
                 AzureContainerRegistryClient client = await ACRTestUtil.GetACRClientAsync(context, ACRTestUtil.ManagedTestRegistryForChanges);
                 string digest = await UploadLayer(GenerateStreamFromString("Testdata"), client, ACRTestUtil.BlobTestRepository);
-                var blob = await client.Blob.GetAsync(ACRTestUtil.BlobTestRepository, digest);
                 await client.Blob.DeleteAsync(ACRTestUtil.BlobTestRepository, digest);
                 // Should not find layer
                 Assert.Throws<AcrErrorsException>(() => { client.Blob.CheckAsync(ACRTestUtil.BlobTestRepository, digest).GetAwaiter().GetResult(); }); // Should error

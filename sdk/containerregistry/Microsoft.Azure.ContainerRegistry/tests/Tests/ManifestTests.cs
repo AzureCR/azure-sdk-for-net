@@ -511,7 +511,6 @@ namespace ContainerRegistry.Tests
             Assert.Equal(expectedManifestBase.ChangeableAttributes.WriteEnabled, actualManifestBase.ChangeableAttributes.WriteEnabled);
         }
 
-
         private void VerifyManifest(Manifest baseManifest, Manifest actualManifest)
         {
             Assert.Equal(baseManifest.GetType(), actualManifest.GetType());
